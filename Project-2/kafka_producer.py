@@ -1,4 +1,3 @@
-# proyek_big_data_kafka_spark/kafka_producer.py
 import pandas as pd
 from kafka import KafkaProducer
 import json
@@ -6,7 +5,6 @@ import time
 import random
 
 KAFKA_TOPIC = 'smart_home_stream'
-# Jika producer.py dijalankan di host Anda dan Kafka di Docker mem-publish port 9092:
 KAFKA_BROKERS = ['localhost:9092'] 
 
 # Inisialisasi Kafka Producer
@@ -21,7 +19,6 @@ except Exception as e:
     print("Pastikan Kafka broker berjalan dan dapat diakses di KAFKA_BROKERS.")
     exit()
 
-# Pastikan file dataset ada di path yang benar relatif terhadap skrip ini
 DATASET_PATH = 'dataset/smart_home_device_usage_data.csv' 
 
 def send_data_from_csv(file_path):
@@ -35,7 +32,6 @@ def send_data_from_csv(file_path):
 
     for index, row in df.iterrows():
         message = row.to_dict()
-        # UserID mungkin tidak selalu relevan untuk "event" baru, tapi kita sertakan saja
         # message['event_timestamp'] = time.time() # Opsional: tambahkan timestamp event
         
         try:
@@ -43,7 +39,6 @@ def send_data_from_csv(file_path):
             print(f"Sent message ({index+1}/{len(df)}): {message['UserID']}") # Print UserID untuk tracking
         except Exception as e:
             print(f"Error sending message for UserID {message.get('UserID', 'N/A')}: {e}")
-            # Anda bisa menambahkan logika retry atau menghentikan jika ada error fatal
             
         sleep_time = random.uniform(0.01, 0.1) # Jeda kecil antara 10ms dan 100ms
         time.sleep(sleep_time)

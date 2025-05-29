@@ -1,24 +1,22 @@
-# proyek_big_data_kafka_spark/app_api.py
+import pandas as pd
+import os
+import glob
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pyspark.sql import SparkSession
 from pyspark.ml import PipelineModel
-import pandas as pd # Hanya untuk membuat DataFrame sementara sebelum ke Spark
-import os
-import glob
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
 
 app = Flask(__name__)
 CORS(app)
 
 # Inisialisasi SparkSession global untuk API
-# Hanya buat sekali untuk efisiensi
 try:
     spark = SparkSession.builder.appName("SmartHomeAPI").getOrCreate()
     print("SparkSession for API initialized.")
 except Exception as e:
     print(f"Error initializing SparkSession for API: {e}")
-    spark = None # Tandai sebagai None jika gagal
+    spark = None
 
 MODEL_BASE_DIR = 'spark_models/'
 LATEST_SET_NUM = None
@@ -75,8 +73,7 @@ def load_latest_models():
     except Exception as e:
         print(f"Error loading one or more Spark models for set {LATEST_SET_NUM}: {e}")
 
-# Panggil fungsi load model saat aplikasi dimulai
-if spark: # Hanya load jika SparkSession berhasil dibuat
+if spark:
     load_latest_models()
 
 def create_spark_dataframe_from_request(json_data):
@@ -88,15 +85,12 @@ def create_spark_dataframe_from_request(json_data):
     if not spark:
         raise ConnectionError("SparkSession not available in API.")
 
-    # Kolom-kolom ini adalah input mentah sebelum masuk ke pipeline di Spark
-    # Tidak perlu menyertakan kolom target seperti SmartHomeEfficiency atau MalfunctionIncidents
-    # kecuali jika pipeline Anda secara eksplisit membutuhkannya untuk sesuatu (biasanya tidak untuk prediksi)
     schema = StructType([
         StructField("DeviceType", StringType(), True),
         StructField("UsageHoursPerDay", DoubleType(), True),
         StructField("EnergyConsumption", DoubleType(), True),
         StructField("UserPreferences", IntegerType(), True),
-        StructField("MalfunctionIncidents", IntegerType(), True), # Dibutuhkan sebagai fitur oleh model efisiensi
+        StructField("MalfunctionIncidents", IntegerType(), True),
         StructField("DeviceAgeMonths", IntegerType(), True)
     ])
     
@@ -129,11 +123,11 @@ def api_predict_efficiency():
         # Ambil hasil prediksi (kolom 'prediction' default)
         result = prediction_df.select("prediction").first()[0]
         
-        # Ambil probabilitas (kolom 'probability' default, berupa VectorUDT)
+        # Ambil probabilitas (kolom 'probability' default)
         probability_value = None
         if "probability" in prediction_df.columns:
             prob_vector = prediction_df.select("probability").first()[0]
-            probability_value = float(prob_vector[int(result)]) # Probabilitas kelas yang diprediksi
+            probability_value = float(prob_vector[int(result)])
 
         return jsonify({
             "predicted_efficiency_class": int(result), # 0 atau 1
@@ -154,8 +148,6 @@ def api_predict_malfunction():
             return jsonify({"error": "Request body must be JSON"}), 400
         
         # Untuk model malfungsi, 'MalfunctionIncidents' adalah target, jadi tidak boleh ada di input fitur
-        # Kita bisa membuat DataFrame tanpa kolom itu jika perlu atau biarkan pipeline menghandle
-        # Untuk konsistensi, kita bisa gunakan create_spark_dataframe_from_request dan pipeline akan memilih fitur yang relevan
         input_df = create_spark_dataframe_from_request(data) # Pipeline akan memilih fitur yang benar
 
         prediction_df = model_malfunction.transform(input_df)
@@ -177,7 +169,7 @@ def api_get_device_segment():
         input_df = create_spark_dataframe_from_request(data)
         
         prediction_df = model_clustering.transform(input_df)
-        # Kolom output KMeans biasanya 'prediction' yang berisi cluster ID
+        # Kolom output KMeans
         result = prediction_df.select("prediction").first()[0] 
         return jsonify({"device_segment_id": int(result)})
     except Exception as e:
@@ -186,8 +178,6 @@ def api_get_device_segment():
 
 @app.route('/', methods=['GET'])
 def health_check():
-    # Anda bisa menambahkan informasi lebih lanjut jika mau
-    # seperti versi model yang dimuat atau status LATEST_SET_NUM
     return jsonify({
         "status": "API is running", 
         "message": "Welcome to Smart Home Analytics API!",
@@ -200,6 +190,4 @@ if __name__ == '__main__':
     else:
         print("Starting Flask API server on port 5000...")
         app.run(host='0.0.0.0', port=5000, debug=True)
-        # Pertimbangkan untuk menghentikan SparkSession saat aplikasi Flask berhenti
-        # Ini bisa lebih kompleks untuk diimplementasikan dengan benar dalam skrip sederhana
         # spark.stop() 

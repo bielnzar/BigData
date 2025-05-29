@@ -1,8 +1,6 @@
-# proyek_big_data_kafka_spark/app_ui.py
 import streamlit as st
 import requests
 import json
-# import pandas as pd # Tidak dibutuhkan lagi di sini jika API selalu tersedia
 
 API_BASE_URL = "http://localhost:5000" 
 
@@ -68,7 +66,7 @@ st.markdown("Selamat datang! Silakan pilih model dan masukkan data untuk mendapa
 
 DEVICE_TYPES = ['Lights', 'Thermostat', 'Smart Speaker', 'Camera', 'Security System']
 
-# --- Model 1: Prediksi Efisiensi Perangkat ---
+# Model 1: Prediksi Efisiensi Perangkat
 st.header("1. Prediksi Efisiensi Perangkat")
 st.markdown("""
 Model ini memprediksi apakah sebuah perangkat smart home beroperasi secara efisien atau tidak,
@@ -118,7 +116,7 @@ if submit_button_eff:
 
 
         if probability is not None:
-            st.progress(float(probability)) # Pastikan probabilitas adalah float
+            st.progress(float(probability))
             st.caption(f"Keyakinan model untuk kelas yang diprediksi: {float(probability)*100:.1f}%")
         
         with st.expander("Lihat Detail Payload & Respons API"):
@@ -126,7 +124,7 @@ if submit_button_eff:
             st.json(result_eff)
 
 st.markdown("---")
-# --- Model 2: Prediksi Potensi Kerusakan ---
+# Model 2: Prediksi Potensi Kerusakan
 st.header("2. Prediksi Potensi Kerusakan")
 st.markdown("""
 Model ini memprediksi perkiraan jumlah insiden kerusakan yang mungkin terjadi pada perangkat
@@ -171,7 +169,7 @@ if submit_button_malf:
             st.json(result_malf)
 st.markdown("---")
 
-# --- Model 3: Segmentasi Perangkat ---
+# Model 3: Segmentasi Perangkat
 st.header("3. Identifikasi Segmen Perangkat")
 st.markdown("""
 Model ini mengelompokkan perangkat ke dalam segmen tertentu berdasarkan karakteristiknya.
@@ -229,4 +227,4 @@ if submit_button_seg:
             st.json(result_seg)
 
 st.markdown("---")
-st.caption("Aplikasi ini dibuat untuk demonstrasi integrasi Kafka, Spark, API, dan UI. © 2025")
+st.caption("Integrasi Kafka, Spark, API (Kelompok 12). © 2025")

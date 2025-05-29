@@ -1,15 +1,14 @@
-# proyek_big_data_kafka_spark/kafka_consumer_batch.py
 from kafka import KafkaConsumer
 import json
 import pandas as pd
 import os
-import time # Untuk memberi nama file batch unik jika dijalankan berulang
+import time
 
 KAFKA_TOPIC = 'smart_home_stream'
-KAFKA_BROKERS = ['localhost:9092'] # Sama seperti producer
+KAFKA_BROKERS = ['localhost:9092']
 BATCH_SIZE = 1000
-OUTPUT_DIR = 'batched_data'       # Akan dibuat di dalam proyek_big_data_kafka_spark/
-FILE_PREFIX = f'smart_home_batch_{int(time.time())}_' # Tambahkan timestamp untuk keunikan run
+OUTPUT_DIR = 'batched_data'
+FILE_PREFIX = f'smart_home_batch_{int(time.time())}_'
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
@@ -22,7 +21,7 @@ try:
         auto_offset_reset='earliest', 
         consumer_timeout_ms=30000, # Stop setelah 30 detik jika tidak ada pesan baru
         value_deserializer=lambda v: json.loads(v.decode('utf-8')),
-        group_id='smart-home-batcher-group' # group_id penting untuk tracking offset
+        group_id='smart-home-batcher-group'
     )
     print("Kafka Consumer connected successfully!")
 except Exception as e:
@@ -44,13 +43,13 @@ def consume_and_batch():
             print(f"Received message ({processed_message_count}): UserID {msg_data.get('UserID', 'N/A')}")
 
             if first_message_data is None and isinstance(msg_data, dict):
-                first_message_data = msg_data # Simpan struktur pesan pertama
+                first_message_data = msg_data
 
             if isinstance(msg_data, dict):
                  messages_buffer.append(msg_data)
 
             if len(messages_buffer) >= BATCH_SIZE:
-                if first_message_data: # Pastikan kita punya struktur kolom
+                if first_message_data:
                     df_batch = pd.DataFrame(messages_buffer, columns=first_message_data.keys())
                     file_path = os.path.join(OUTPUT_DIR, f"{FILE_PREFIX}{batch_file_count}.csv")
                     df_batch.to_csv(file_path, index=False)

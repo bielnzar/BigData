@@ -1,14 +1,11 @@
-# analyze_clusters.py
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 from pyspark.ml import PipelineModel
 import os
 import glob
 
-# --- Konfigurasi ---
 MODEL_BASE_DIR = 'spark_models/'
-# GANTI DENGAN NOMOR SET MODEL CLUSTERING TERAKHIR YANG INGIN DIANALISIS
-# Cara otomatis menentukan LATEST_SET_NUM:
+# otomatis menentukan LATEST_SET_NUM:
 latest_set_num_found = None
 if os.path.exists(MODEL_BASE_DIR):
     model_sets_nums = []
@@ -22,16 +19,12 @@ if os.path.exists(MODEL_BASE_DIR):
     if model_sets_nums:
         latest_set_num_found = max(model_sets_nums)
 
-LATEST_SET_NUM = latest_set_num_found # Gunakan yang ditemukan, atau set manual jika gagal
-# LATEST_SET_NUM = 6 # Atau override manual jika perlu
+LATEST_SET_NUM = latest_set_num_found # set manual jika gagal
+# LATEST_SET_NUM = 6 # override manual jika perlu
 
 BATCH_DATA_DIR_ANALYSIS = 'batched_data/'
 BATCH_FILE_PATTERN_ANALYSIS = os.path.join(BATCH_DATA_DIR_ANALYSIS, 'smart_home_batch_*.csv')
 
-# Kolom asli yang digunakan sebagai fitur saat training model clustering
-# Pastikan ini SAMA PERSIS dengan yang Anda gunakan di pipeline clustering di spark_training.py
-# Terutama nama kolom setelah StringIndexer/OneHotEncoder jika Anda menganalisis fitur transformed,
-# TAPI untuk interpretasi pengguna, kita ingin fitur asli.
 ORIGINAL_FEATURE_COLS_FOR_INTERPRETATION = [
     "DeviceType", 
     "UsageHoursPerDay", 
@@ -50,7 +43,6 @@ def analyze_clusters():
 
     spark_analyzer = SparkSession.builder.appName(f"ClusterAnalysis_Set{LATEST_SET_NUM}").getOrCreate()
     
-    # --- Atur Level Log Spark ---
     spark_analyzer.sparkContext.setLogLevel("WARN") # Pilihan: "INFO", "WARN", "ERROR"
     print("Level log Spark diatur ke WARN.")
 
@@ -69,7 +61,7 @@ def analyze_clusters():
         spark_analyzer.stop()
         return
     
-    # --- Menggabungkan Semua File Batch untuk Analisis ---
+    # Menggabungkan Semua File Batch untuk Analisis
     all_batch_files = sorted(glob.glob(BATCH_FILE_PATTERN_ANALYSIS))
     
     if not all_batch_files:
@@ -78,7 +70,7 @@ def analyze_clusters():
         return
 
     print(f"\nDitemukan file batch untuk analisis: {len(all_batch_files)} file.")
-    # print(all_batch_files) # Uncomment untuk melihat daftar file
+    # print(all_batch_files) # melihat daftar file
 
     df_for_analysis = None
     for i, file_path in enumerate(all_batch_files):
@@ -105,7 +97,7 @@ def analyze_clusters():
     print("Skema data gabungan:")
     df_for_analysis.printSchema()
 
-    # --- Mendapatkan Prediksi Cluster ---
+    # Mendapatkan Prediksi Cluster
     print("\nMelakukan transformasi data untuk mendapatkan prediksi cluster...")
     try:
         clustered_data = loaded_clustering_model.transform(df_for_analysis)
@@ -119,8 +111,7 @@ def analyze_clusters():
         spark_analyzer.stop()
         return
 
-    # --- Analisis Pusat Cluster (Jika KMeans) ---
-    # Tahap terakhir dari pipeline harusnya model KMeans
+    # Analisis Pusat Cluster (KMeans)
     try:
         kmeans_model_in_pipeline = loaded_clustering_model.stages[-1]
         if hasattr(kmeans_model_in_pipeline, 'clusterCenters'):
@@ -133,7 +124,7 @@ def analyze_clusters():
     except Exception as e_centers:
         print(f"Error saat mencoba mengambil pusat cluster: {e_centers}")
 
-    # --- Analisis Karakteristik per Cluster (Menggunakan Fitur Asli) ---
+    # Analisis Karakteristik per Cluster
     print("\nAnalisis Karakteristik per Cluster (menggunakan fitur asli sebelum scaling):")
     
     if "prediction" not in clustered_data.columns:
@@ -143,7 +134,7 @@ def analyze_clusters():
         spark_analyzer.stop()
         return
     
-    # Cast kolom prediksi ke integer jika belum (beberapa versi Spark bisa mengembalikan double)
+    # Cast kolom prediksi ke integer
     if dict(clustered_data.dtypes)['prediction'] != 'int':
        print("Warning: Tipe data kolom 'prediction' bukan integer, mencoba cast.")
        clustered_data = clustered_data.withColumn("prediction", col("prediction").cast("integer"))
@@ -153,7 +144,6 @@ def analyze_clusters():
         print(f"\nJumlah K (cluster) pada model yang dimuat: {num_clusters}")
     except Exception as e_getk:
         print(f"Error mendapatkan K dari model: {e_getk}. Mencoba dari data prediksi...")
-        # Jika getK() gagal, coba hitung dari data prediksi (kurang ideal)
         distinct_clusters = clustered_data.select("prediction").distinct().collect()
         num_clusters = len(distinct_clusters)
         print(f"Jumlah cluster unik ditemukan di data prediksi: {num_clusters}")
@@ -192,7 +182,7 @@ def analyze_clusters():
             else: # Kolom numerik
                 print(f"  Statistik untuk {feature_col}:")
                 try:
-                    # Menggunakan backtick untuk nama kolom jika ada spasi atau karakter khusus (tidak dalam kasus ini tapi praktik baik)
+                    # Menggunakan backtick untuk nama kolom jika ada spasi atau karakter khusus
                     stats = cluster_subset_df.selectExpr(
                         f"round(mean(`{feature_col}`), 2) as mean_val",
                         f"round(stddev_pop(`{feature_col}`), 2) as std_val",
