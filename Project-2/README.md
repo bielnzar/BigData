@@ -133,7 +133,7 @@ Setelah model-model dilatih dan disimpan:
 python app_api.py
 ```
 
-Server API akan berjalan (default di http://localhost:5000). API akan secara otomatis memuat set model terbaru dari direktori spark_models/.
+Server API akan berjalan (default di `http://localhost:5000`). API akan secara otomatis memuat set model terbaru dari direktori spark_models/.
 
 ### 7. Menggunakan API
 Kita dapat berinteraksi dengan API menggunakan tools seperti Postman, curl, atau melalui UI Streamlit.
