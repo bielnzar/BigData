@@ -1,0 +1,9 @@
+pandas
+kafka-python
+pyspark
+flask
+flask-cors
+scikit-learn
+joblib
+requests
+streamlit

@@ -1,3 +1,7 @@
-/artifacts
-/batched_data
-/spark_models
+/Lama/artifacts
+/Lama/batched_data
+/Lama/spark_models
+
+/Revisi/artifacts
+/Revisi/batched_data
+/Revisi/spark_models
