@@ -216,6 +216,16 @@ Semua endpoint menerima request `POST` dengan body JSON.
 
 ## Documentation
 
-![Image 1]()
+![Image 1](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/1.png)
+![Image 2](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/2.png)
+![Image 3](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/3.png)
+![Image 4](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/4.png)
+![Image 5](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/5.png)
+![Image 6](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/6.png)
+![Image 7](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/7.png)
+![Image 8](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/8.png)
+![Image 9](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/9.png)
+![Image 10](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/10.png)
+![Image 11](https://github.com/bielnzar/BigData/blob/main/Project-2/Revisi/Images/11.png)
 
  > Sekian, Semoga Bermanfaat:)
