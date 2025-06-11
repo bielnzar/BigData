@@ -213,4 +213,9 @@ Semua endpoint menerima request `POST` dengan body JSON.
     "Traffic Density": 0.6
 }
 ```
+
+## Documentation
+
+![Image 1]()
+
  > Sekian, Semoga Bermanfaat:)

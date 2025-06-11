@@ -1,13 +1,10 @@
-# proyek_big_data_kafka_spark/docker-compose.yml
-version: '3.8' # Menggunakan versi yang cukup modern
-
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.2 # Anda bisa menggunakan versi terbaru atau yang stabil
+    image: confluentinc/cp-zookeeper:7.3.2
     container_name: zookeeper_urban_traffic
     hostname: zookeeper
     ports:
-      - "2181:2181" # Port Zookeeper standar
+      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -18,44 +15,39 @@ services:
       retries: 5
 
   kafka:
-    image: confluentinc/cp-kafka:7.3.2 # Gunakan versi yang sama atau kompatibel dengan Zookeeper
+    image: confluentinc/cp-kafka:7.3.2
     container_name: kafka_urban_traffic
     hostname: kafka
     depends_on:
       zookeeper:
-        condition: service_healthy # Menunggu Zookeeper sehat sebelum Kafka dimulai
+        condition: service_healthy
     ports:
-      # Port untuk diakses dari host Anda (misalnya, producer/consumer Python, Spark master jika di host)
       - "9092:9092" 
-      # Port untuk komunikasi internal antar broker atau tools di dalam jaringan Docker jika Anda punya cluster Kafka
-      # atau jika ada komponen lain di jaringan Docker yang perlu akses Kafka via nama service 'kafka'
-      # - "29092:29092" # Kita akan definisikan listener ini di bawah
+
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181' # Kafka akan menemukan Zookeeper dengan nama service 'zookeeper'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       
       # Listener untuk koneksi dari host Anda (luar Docker)
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092 # 0.0.0.0 agar bisa diakses dari mana saja
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
 
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT # Untuk komunikasi antar broker jika ada cluster
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Cocok untuk single-node dev setup
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1 # Untuk image Confluent
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1 # Untuk image Confluent
-      # KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true' # Biasanya true by default, tapi bisa eksplisit
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1 
+
     healthcheck:
       test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
       interval: 30s
       timeout: 10s
       retries: 5
     volumes:
-      # Volume untuk persistensi data Kafka (opsional, tapi bagus untuk dev agar data topik tidak hilang saat kontainer stop/start)
-      # Ganti dengan path absolut di host Anda jika perlu.
       - kafka_data_urban_traffic:/var/lib/kafka/data 
 
 volumes:
-  kafka_data_urban_traffic: # Mendefinisikan named volume untuk data Kafka
+  kafka_data_urban_traffic: 
