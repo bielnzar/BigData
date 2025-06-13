@@ -60,6 +60,8 @@ Proyek ini bertujuan untuk menjawab pertanyaan utama: Bagaimana faktor-faktor so
 
 ### Diagram Arsitektur Solusi
 
+![Image-Arsitektur](https://github.com/bielnzar/BigData/blob/main/Final-Project/images/arsitektur.png)
+
 ## Penjelasan Rinci Alur Kerja
 
 - Ingest (Pengumpulan Data): Sebuah skrip Python (Publisher) membaca dataset .`csv` dan mempublikasikannya baris per baris sebagai pesan ke Apache Kafka untuk mensimulasikan aliran data.
