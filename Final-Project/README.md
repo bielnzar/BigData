@@ -38,7 +38,7 @@ Proyek ini bertujuan untuk menjawab pertanyaan utama: Bagaimana faktor-faktor so
 
 ## Landasan Teknologi
 
-- Untuk membangun platform ini, digunakan serangkaian teknologi open-source yang telah menjadi standar industri dalam rekayasa data dan ilmu data.
+Untuk membangun platform ini, digunakan serangkaian teknologi open-source yang telah menjadi standar industri dalam rekayasa data dan ilmu data.
 
 - Apache Kafka: Berfungsi sebagai sistem messaging terdistribusi yang berperan sebagai "pintu masuk" utama untuk data. Kafka mampu menangani aliran data bervolume tinggi secara real-time.
 
