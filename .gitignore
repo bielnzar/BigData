@@ -1,0 +1,10 @@
+.vscode/
+
+docker-compose.override.yml
+docker-compose.local.yml
+
+data/raw/
+data/processed/
+
+*.log
+logs/
