@@ -10,11 +10,13 @@
 |        Hasan                  | 5027231073 |
 | Muhammad Kenas Galeno Putra   | 5027231069 |
 | Muhammad Hildan Adiwena       | 5027231077 |
-| Mochamad Fadhi Saifullah      | 5027231068 |
+| Mochamad Fadhil Saifullah      | 5027231068 |
 
 ## Platform Analitik Prediktif untuk Pengentasan Disparitas Kesehatan Global
 
-Dataset yang digunakan [Global Health Statistics](https://www.kaggle.com/datasets/malaiarasugraj/global-health-statistics)
+Dataset yang digunakan 
+- Terstuktur: [Global Health Statistics](https://www.kaggle.com/datasets/malaiarasugraj/global-health-statistics)
+- Tidak Terstruktur: [Medical Abstract Classification Dataset](https://www.kaggle.com/datasets/viswaprakash1990/medical-abstract-classification-dataset)
 
 ## Pendahuluan
 
@@ -64,7 +66,7 @@ Untuk membangun platform ini, digunakan serangkaian teknologi open-source yang t
 
 ## Penjelasan Rinci Alur Kerja
 
-- Ingest (Pengumpulan Data): Sebuah skrip Python (Publisher) membaca dataset .`csv` dan mempublikasikannya baris per baris sebagai pesan ke Apache Kafka untuk mensimulasikan aliran data.
+- Ingest (Pengumpulan Data): Sebuah skrip Python (Publisher) membaca dataset `.csv/.json/.txt` dan mempublikasikannya baris per baris sebagai pesan ke Apache Kafka untuk mensimulasikan aliran data.
 
 - Pemrosesan oleh Spark: Apache Spark membaca data dari Kafka. Spark melakukan proses ETL (membersihkan, mengubah, dan memperkaya data) dan menyimpannya ke Delta Lake di atas MinIO dengan struktur medallion (Bronze, Silver, Gold).
 
